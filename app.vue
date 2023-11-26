@@ -1,130 +1,110 @@
 <template>
-  <div class="mt-12">
-    <v-sheet width="300" class="mx-auto">
-      <v-form fast-fail @submit.prevent>
-        <v-select
-          v-model="form.sector"
-          return-object
-          :items="sectorItems"
-          item-title="title"
-          item-value="value"
-        ></v-select>
+  <div>
+    {{ form }}
+    <v-stepper v-model="currentStep">
+      <template v-slot:default="{ prev, next }">
+        <v-stepper-header>
+          <template v-for="step in totalSteps" :key="`${step}-step`">
+            <v-stepper-item
+              :complete="currentStep > step"
+              :step="`Step {{ step }}`"
+              :value="step"
+            ></v-stepper-item>
 
-        <v-select
-          v-if="form.sector.value"
-          v-model="form.industry"
-          return-object
-          :items="industryItems"
-          item-title="title"
-          item-value="value"
-        ></v-select>
+            <v-divider v-if="step !== totalSteps" :key="step"></v-divider>
+          </template>
+        </v-stepper-header>
 
-        <v-select
-          v-model="form.languages"
-          return-object
-          :items="languages"
-          item-title="title"
-          item-value="value"
-        ></v-select>
+        <v-stepper-window>
+          <v-stepper-window-item
+            v-for="(step, stepIdx) in totalSteps"
+            :key="`${step}-content`"
+            :value="step"
+          >
+            <v-card v-if="steps[stepIdx]">
+              <div class="d-flex flex-column justify-center align-center py-24">
+                <div class="text-center my-4">
+                  {{ steps[stepIdx].title }}
+                </div>
+                <component
+                  class="flex-grow-0 component-container"
+                  :is="steps[stepIdx].component"
+                  v-bind="{
+                    ...(steps[stepIdx].props || {}),
+                    ...activeStepProps,
+                  }"
+                  v-on="activeStepEvents"
+                ></component>
+              </div>
+            </v-card>
+          </v-stepper-window-item>
+        </v-stepper-window>
 
-        <v-btn
-          type="submit"
-          block
-          class="mt-2"
-          @click="submit"
-          :loading="loading"
-          >Submit</v-btn
-        >
-      </v-form>
-    </v-sheet>
-
-    <div class="domain-table-wrapper my-8" v-if="sonuc">
-      <v-table theme="dark" class="domain-table">
-        <thead>
-          <tr>
-            <th class="text-left">Domains</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, key) in sonuc" :key="key">
-            <td
-              :class="
-                item.status ? 'bg-light-green-lighten-2' : 'bg-red-darken-2'
-              "
-            >
-              {{ item.domain }}
-            </td>
-          </tr>
-        </tbody>
-      </v-table>
-    </div>
+        <v-stepper-actions
+          :disabled="disabled"
+          @click:prev="prev"
+          @click:next="next"
+        ></v-stepper-actions>
+      </template>
+    </v-stepper>
   </div>
 </template>
 
 <script>
-import { sectors, languages } from "./constants/form";
+import { FORM_STEPS } from "./constants";
 
 export default {
   data() {
     return {
-      sonuc: null,
-      loading: false,
-      languages,
-      form: {
-        sector: { title: "Sektor", value: null },
-        industry: { title: "Industri", value: null },
-        languages: { title: "Dil", value: null },
-      },
+      currentStep: 1,
+      totalSteps: 10,
+      form: {},
+      steps: FORM_STEPS,
     };
   },
 
   computed: {
-    sectorItems() {
-      return sectors.map((x) => {
-        return { title: x.label, value: x.key };
-      });
+    disabled() {
+      return this.currentStep === 1
+        ? "prev"
+        : this.currentStep === this.totalSteps
+        ? "next"
+        : undefined;
     },
-
-    industryItems() {
-      return sectors
-        .find((x) => x.key === this.form.sector.value)
-        .industry.map((x) => {
-          return { title: x.label, value: x.key };
-        });
+    categoryList() {
+      return [
+        "California",
+        "Colorado",
+        "Florida",
+        "Georgia",
+        "Texas",
+        "Wyoming",
+      ];
     },
-  },
+    activeStepProps() {
+      const props = {};
 
-  methods: {
-    async submit() {
-      this.loading = true;
-      const data = await fetch("/api/domain", {
-        method: "POST",
-        body: JSON.stringify({
-          industry: this.form.industry.value,
-          languages: this.form.languages.value,
-          wordsCount: 2,
-        }),
+      this.steps?.[this.currentStep - 1]?.dynamicProps?.forEach((x) => {
+        props[x.name] = this[x.reference];
       });
 
-      const parsedData = await data.json();
-
-      if (parsedData) {
-        this.sonuc = parsedData;
-      }
-
-      this.loading = false;
+      return props;
+    },
+    activeStepEvents() {
+      const activeStep = this.steps[this.currentStep - 1];
+      return {
+        // event handler for select
+        "update:modelValue": (data) => {
+          this.form[activeStep.id] = data;
+        },
+      };
     },
   },
 };
 </script>
 
 <style scoped>
-.domain-table-wrapper {
-  display: flex;
-  justify-content: center;
-}
-.domain-table {
-  width: 100%;
-  max-width: 700px;
+.component-container {
+  min-width: 36rem;
 }
 </style>
