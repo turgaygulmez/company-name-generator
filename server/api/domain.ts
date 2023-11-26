@@ -1,6 +1,9 @@
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { domain } from "whoiser";
 import { createQuestion } from "../helpers/ai";
+import { AI_RESPONSE_MOCK } from "../mock/ai";
+import { SystemMessage } from "langchain/schema";
+import { GPT_MODEL_NAME } from "../constants/ai";
 
 function isDomainAvailable(domainCheck: any) {
   if (Object.keys(domainCheck).length === 0) {
@@ -25,12 +28,32 @@ function isDomainAvailable(domainCheck: any) {
   return false;
 }
 
+async function checkDomains(urls = []) {
+  const result = [];
+
+  for await (const url of urls) {
+    const domainCheck = await domain(url);
+
+    result.push({
+      domain: url,
+      status: isDomainAvailable(domainCheck),
+    });
+  }
+
+  return result;
+}
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const parsedBody = JSON.parse(body);
 
   const model = new ChatOpenAI({
-    modelName: "gpt-3.5-turbo",
+    modelName: GPT_MODEL_NAME,
+    temperature: 1,
+    maxTokens: 2500,
+    topP: 1,
+    frequencyPenalty: 0,
+    presencePenalty: 0,
   });
 
   const question = createQuestion({
@@ -38,34 +61,14 @@ export default defineEventHandler(async (event) => {
     numberOfOutput: 20,
   });
 
-  // const res = await model.predictMessages([new HumanMessage(question)]);
+  let aiResponse = null;
 
-  let domainNames = JSON.parse(`[
-    "insaatmerkezi.com",
-    "yapikonu.com",
-    "inovatifinsaat.com",
-    "hizmetininsaati.com",
-    "yapidestek.com",
-    "uyguninsaat.com",
-    "proaktifyapi.com",
-    "infallahizmet.com",
-    "tamirustas.com",
-    "tesisatci.com",
-    "restorasyonmerkezi.com"
-  ]`);
-
-  const result = [];
-
-  for (const name of domainNames) {
-    const domainCheck = await domain(name);
-    const domainCheckTr = await domain(`${name}.tr`);
-
-    result.push({
-      domain: name,
-      status: isDomainAvailable(domainCheck),
-      statusTr: isDomainAvailable(domainCheckTr),
-    });
+  if (process.env.USE_AI_MOCK) {
+    aiResponse = AI_RESPONSE_MOCK;
+  } else {
+    const response = await model.call([new SystemMessage(question)]);
+    aiResponse = response.text;
   }
 
-  return result;
+  return await checkDomains(JSON.parse(aiResponse));
 });

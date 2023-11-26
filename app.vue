@@ -42,8 +42,7 @@
       <v-table theme="dark" class="domain-table">
         <thead>
           <tr>
-            <th class="text-left">Domain</th>
-            <th class="text-left">Domain TR</th>
+            <th class="text-left">Domains</th>
           </tr>
         </thead>
         <tbody>
@@ -54,13 +53,6 @@
               "
             >
               {{ item.domain }}
-            </td>
-            <td
-              :class="
-                item.statusTr ? 'bg-light-green-lighten-2' : 'bg-red-darken-2'
-              "
-            >
-              {{ `${item.domain}.tr` }}
             </td>
           </tr>
         </tbody>
@@ -105,7 +97,7 @@ export default {
   methods: {
     async submit() {
       this.loading = true;
-      const data = await fetch("/api/name", {
+      const data = await fetch("/api/domain", {
         method: "POST",
         body: JSON.stringify({
           industry: this.form.industry.value,
