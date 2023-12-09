@@ -1,6 +1,5 @@
 <template>
-  <div>
-    {{ form }}
+  <div class="tw-p-8">
     <v-stepper v-model="currentStep">
       <template v-slot:default="{ prev, next }">
         <v-stepper-header>
@@ -22,12 +21,10 @@
             :value="step"
           >
             <v-card v-if="steps[stepIdx]">
-              <div class="d-flex flex-column justify-center align-center py-24">
-                <div class="text-center my-4">
-                  {{ steps[stepIdx].title }}
-                </div>
+              <div
+                class="tw-flex tw-justify-center tw-flex-col tw-items-center"
+              >
                 <component
-                  class="flex-grow-0 component-container"
                   :is="steps[stepIdx].component"
                   v-bind="{
                     ...(steps[stepIdx].props || {}),
@@ -41,7 +38,7 @@
         </v-stepper-window>
 
         <v-stepper-actions
-          :disabled="disabled"
+          :next-text="nextText"
           @click:prev="prev"
           @click:next="next"
         ></v-stepper-actions>
@@ -51,36 +48,53 @@
 </template>
 
 <script>
-import { FORM_STEPS } from "./constants";
+import { FORM_STEPS } from "@/constants";
+import { OptionSelector, Preview, Result } from "@/components";
 
 export default {
+  components: {
+    OptionSelector,
+    Preview,
+    Result,
+  },
   data() {
     return {
       currentStep: 1,
-      totalSteps: 10,
+      totalSteps: FORM_STEPS?.length,
       form: {},
       steps: FORM_STEPS,
+      countryList: [],
+      categoryList: [],
+      fullActivityList: [],
     };
   },
 
+  async created() {
+    this.countryList = await $fetch("/api/country");
+    this.categoryList = await $fetch("/api/category");
+    this.fullActivityList = await $fetch("/api/business");
+  },
+
   computed: {
-    disabled() {
-      return this.currentStep === 1
-        ? "prev"
-        : this.currentStep === this.totalSteps
-        ? "next"
-        : undefined;
+    nextText() {
+      if (this.currentStep === this.totalSteps - 1) {
+        return "GENERATE";
+      }
+
+      return "NEXT";
     },
-    categoryList() {
-      return [
-        "California",
-        "Colorado",
-        "Florida",
-        "Georgia",
-        "Texas",
-        "Wyoming",
-      ];
+
+    activityList() {
+      return this.fullActivityList
+        ?.filter?.((x) => x.category === this.form.category)
+        ?.map((x) => {
+          return {
+            title: x.activity,
+            value: x.activity,
+          };
+        });
     },
+
     activeStepProps() {
       const props = {};
 
@@ -93,7 +107,9 @@ export default {
     activeStepEvents() {
       const activeStep = this.steps[this.currentStep - 1];
       return {
-        // event handler for select
+        "update:form": (data) => {
+          this.form[activeStep.id] = data;
+        },
         "update:modelValue": (data) => {
           this.form[activeStep.id] = data;
         },
@@ -102,9 +118,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.component-container {
-  min-width: 36rem;
-}
-</style>
