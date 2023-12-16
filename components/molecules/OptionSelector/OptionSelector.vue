@@ -1,6 +1,5 @@
 <template>
   <div class="tw-max-w-[48rem] tw-w-full">
-    <div class="text-center my-4">{{ title }}</div>
     <v-select
       :items="items"
       :label="label"

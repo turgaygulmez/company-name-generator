@@ -24,6 +24,9 @@
               <div
                 class="tw-flex tw-justify-center tw-flex-col tw-items-center"
               >
+                <div v-if="steps[stepIdx].title" class="text-center my-4">
+                  {{ steps[stepIdx].title }}
+                </div>
                 <component
                   :is="steps[stepIdx].component"
                   v-bind="{

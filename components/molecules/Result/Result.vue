@@ -2,7 +2,11 @@
   <div class="tw-mt-8">
     <p class="tw-mb-4">Available Domains:</p>
 
-    <v-table v-if="domainsList">
+    <div class="tw-flex tw-justify-center" v-if="!domainsList">
+      <span class="loader"></span>
+    </div>
+
+    <v-table v-else>
       <thead>
         <tr>
           <th id="value" class="text-left !tw-font-bold">Domain Names</th>
@@ -46,3 +50,25 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #fff;
+  border-bottom-color: #292422;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>

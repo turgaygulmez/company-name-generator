@@ -3,9 +3,9 @@ export const FORM_STEPS = [
     id: "country",
     label: "Country",
     component: "OptionSelector",
+    title: "Select a country where the business mainly operates",
     props: {
       label: "Select Country",
-      title: "Select a country where the business mainly operates",
     },
     dynamicProps: [
       {
@@ -19,9 +19,9 @@ export const FORM_STEPS = [
     id: "category",
     label: "Category",
     component: "OptionSelector",
+    title: "Select a category where the business falls under",
     props: {
       label: "Select Category",
-      title: "Select a category where the business falls under",
     },
     dynamicProps: [
       {
@@ -35,9 +35,10 @@ export const FORM_STEPS = [
     id: "activity",
     label: "Activity(s)",
     component: "OptionSelector",
+    title: "Select the business activities",
     props: {
       label: "Select Activity",
-      title: "Select the business activities",
+
       multiple: true,
     },
     dynamicProps: [
@@ -52,9 +53,9 @@ export const FORM_STEPS = [
     id: "totalResult",
     label: "Total Result",
     component: "v-text-field",
+    title: "Input how many result you want to generate",
     props: {
       label: "Total Result",
-      title: "Input how many result you want to generate",
       type: "number",
     },
   },
@@ -63,9 +64,9 @@ export const FORM_STEPS = [
     id: "maxWords",
     label: "Max Words",
     component: "v-text-field",
+    title: "Input maximum words to be used in the domain name",
     props: {
       label: "Max Words",
-      title: "Input maximum words to be used in the domain name",
       type: "number",
     },
   },
