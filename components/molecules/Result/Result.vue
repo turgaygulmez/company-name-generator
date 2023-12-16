@@ -23,28 +23,7 @@
 export default {
   data() {
     return {
-      domainsList: [
-        {
-          domain: "CleanComfort.fr",
-          exists: false,
-        },
-        {
-          domain: "RugRefresh.fr",
-          exists: false,
-        },
-        {
-          domain: "SparkleHomes.fr",
-          exists: false,
-        },
-        {
-          domain: "NeatNest.fr",
-          exists: false,
-        },
-        {
-          domain: "PureDwell.fr",
-          exists: false,
-        },
-      ],
+      domainsList: null,
     };
   },
   props: {
