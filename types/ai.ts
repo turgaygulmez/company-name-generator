@@ -1,6 +1,8 @@
 export interface AIRequest {
-  numberOfOutput: number;
-  industry: string;
-  wordsCount: number;
-  languages: string;
+  country: string;
+  category: string;
+  activity: string[];
+  totalResult: number;
+  maxWords: number;
+  hasPreviousUrls: boolean;
 }

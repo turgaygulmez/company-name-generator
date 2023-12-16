@@ -1,19 +1,34 @@
 import { AIRequest } from "~/types/ai";
 
 export const createQuestion = ({
-  numberOfOutput,
-  industry,
-  wordsCount,
-  languages,
+  country,
+  category,
+  activity,
+  totalResult,
+  maxWords,
+  hasPreviousUrls,
 }: AIRequest) => {
   return `
-    You are a service that generates domain names for companies.
-    Create a list of ${numberOfOutput} possible domain names for a business that is focused on ${industry}.
-    Suggested domain name should be ${wordsCount} words in ${languages}
-    The domain name should be simply and easy for people to remember.
+  You are a service that generates domain names for a company.
 
-    Output the final result as a JSON array.
+  The company is located in ${country} and focus on ${category}. 
+  
+  The company main activities are: ${activity?.join(",")}.
+  
+  Create a list of ${totalResult} possible domain names which should have maximum ${maxWords} words and only english characters are being used.
 
-    If the result contains any non English character, convert the character to English character.
+  ${
+    hasPreviousUrls
+      ? "Previously you have created the given urls. Avoid generating the same url again."
+      : ""
+  }
+  
+  The domain name should be simply and easy for people to remember.
+  
+  Output the final result as a JSON array.
+
+  Output only JSON data without any additional text.
+
+  Strip out any markdown json format.
   `;
 };

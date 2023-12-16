@@ -18,10 +18,10 @@
   },
   "dependencies": {
     "@mdi/font": "^7.3.67",
+    "dns": "^0.2.2",
     "langchain": "^0.0.159",
     "openai": "^4.20.0",
     "sass": "^1.69.0",
-    "vuetify": "^3.4.3",
-    "whoiser": "^1.17.1"
+    "vuetify": "^3.4.3"
   }
 }

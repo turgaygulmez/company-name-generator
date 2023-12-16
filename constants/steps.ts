@@ -60,6 +60,17 @@ export const FORM_STEPS = [
   },
 
   {
+    id: "maxWords",
+    label: "Max Words",
+    component: "v-text-field",
+    props: {
+      label: "Max Words",
+      title: "Input maximum words to be used in the domain name",
+      type: "number",
+    },
+  },
+
+  {
     id: "preview",
     label: "Preview",
     component: "Preview",
